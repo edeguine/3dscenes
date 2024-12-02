@@ -1,0 +1,315 @@
+vector toCiel(color col) {
+    // CIELab color conversion
+
+    // color rgb is within 0 - 1
+
+    float R = col.r;
+    float G = col.g;
+    float B = col.b;
+
+	R = R > 0.04045 ?
+		pow(((R + 0.055) / 1.055) , 2.4): 
+		R / 12.92;
+    G = G > 0.04045 ?
+		pow(((G + 0.055) / 1.055), 2.4):
+		G / 12.92;
+	B = B > 0.04045?
+		pow(((B + 0.055) / 1.055) , 2.4):
+		B / 12.92;
+	
+	R *= 100.0;
+    G *= 100.0;
+    B *= 100.0;
+
+	//Observer. = 2°, Illuminant = D65
+	float X = R * 0.4124 + G * 0.3576 + B * 0.1805;
+	float Y = R * 0.2126 + G * 0.7152 + B * 0.0722;
+	float Z = R * 0.0193 + G * 0.1192 + B * 0.9505;
+
+	float sum = X + Y + Z;
+    if (sum == 0) {
+        // Avoid division by zero
+        return vector(0.0, 0.0, 0.0);
+    }
+
+    float x = X / sum;
+    float y = Y / sum;
+    float z = Z / sum;
+
+    return vector(x, y, z);
+}
+
+
+
+color inverseCiel(vector cielColor) {
+    // Assuming cielColor is in the XYZ color space
+    float X = cielColor[0];
+    float Y = cielColor[1];
+    float Z = cielColor[2];
+
+    // Normalize XYZ values to D65 illuminant range
+    X /= 100.0;
+    Y /= 100.0;
+    Z /= 100.0;
+
+    // Convert to linear RGB
+    float R = X *  3.2406 + Y * -1.5372 + Z * -0.4986;
+    float G = X * -0.9689 + Y *  1.8758 + Z *  0.0415;
+    float B = X *  0.0557 + Y * -0.2040 + Z *  1.0570;
+
+    // Apply gamma correction to convert to sRGB
+    R = (R > 0.0031308) ? 1.055 * pow(R, 1.0 / 2.4) - 0.055 : 12.92 * R;
+    G = (G > 0.0031308) ? 1.055 * pow(G, 1.0 / 2.4) - 0.055 : 12.92 * G;
+    B = (B > 0.0031308) ? 1.055 * pow(B, 1.0 / 2.4) - 0.055 : 12.92 * B;
+
+    // Clamp values to valid sRGB range [0, 1]
+    R = (R < 0.0) ? 0.0 : (R > 1.0 ? 1.0 : R);
+    G = (G < 0.0) ? 0.0 : (G > 1.0 ? 1.0 : G);
+    B = (B < 0.0) ? 0.0 : (B > 1.0 ? 1.0 : B);
+
+    // Return color in sRGB space
+    return color(R, G, B);
+}
+
+color rgb2hsv(color c) {
+    float maxc = max(c.r, max(c.g, c.b));
+    float minc = min(c.r, min(c.g, c.b));
+    float delta = maxc - minc;
+    float h = 0.0;
+    if (delta > 0.0) {
+        if (maxc == c.r) {
+            h = (c.g - c.b) / delta + (c.g < c.b ? 6.0 : 0.0);
+        } else if (maxc == c.g) {
+            h = (c.b - c.r) / delta + 2.0;
+        } else {
+            h = (c.r - c.g) / delta + 4.0;
+        }
+        h /= 6.0;
+    }
+    float s = maxc == 0.0 ? 0.0 : delta / maxc;
+    return color(h, s, maxc);
+}
+
+color hsv2rgb(color c) {
+    float h = c.r * 6.0;
+    float s = c.g;
+    float tv = c.b;
+    int i = (int)floor(h);
+    float f = h - i;
+    float p = tv * (1.0 - s);
+    float q = tv * (1.0 - f * s);
+    float t = tv * (1.0 - (1.0 - f) * s);
+    color col;
+    if (i == 0) col = color(tv, t, p);
+    else if (i == 1) col = color(q, tv, p);
+    else if (i == 2) col = color(p, tv, t);
+    else if (i == 3) col = color(p, q, tv);
+    else if (i == 4) col = color(t, p, tv);
+    else col = color(tv, p, q);
+    return col;
+}
+
+
+color mixColorsCiel(color palette[4], vector indices, vector mixes)
+{
+    color color1 = palette[int(abs(indices.x)) % 4];
+    color color2 = palette[int(abs(indices.y)) % 4];
+    color color3 = palette[int(abs(indices.z)) % 4];
+
+    vector cielColor1 = toCiel(color1);
+    vector cielColor2 = toCiel(color2);
+    vector cielColor3 = toCiel(color3);
+
+    vector cielMixed = cielColor1 * mixes[0] + cielColor2 * mixes[1] + cielColor3 * mixes[2];
+    color mixed = inverseCiel(cielMixed);
+
+    // fix value or saturation with hsv if necessary
+    
+    color hsv = rgb2hsv(mixed);
+    hsv.b = 0.6; // adjust brightness to 0.6
+    mixed = hsv2rgb(hsv);
+    
+
+    return mixed;
+}
+
+color mixColorCiel(color cola, color colb, float t) {
+    color ciela = toCiel(cola);
+    color cielb = toCiel(colb);
+
+    color cielMixed = ciela * (1.0 - t) + cielb * t;
+    color mixed = inverseCiel(cielMixed);
+    color hsv = rgb2hsv(mixed);
+    hsv.b = 0.6;
+    mixed = hsv2rgb(hsv);
+    return mixed;
+}
+
+
+
+point periodicCenter(point pos, float xperiod, float yperiod, float zperiod) {
+        return point(
+            floor(pos[0] / xperiod) * xperiod + xperiod / 2.0,
+            floor(pos[1] / yperiod) * yperiod + yperiod / 2.0,
+            floor(pos[2] / zperiod) * zperiod + zperiod / 2.0
+        );
+}
+
+point getGridIdx(point pos, float _XPeriod, float _YPeriod, float _ZPeriod)
+{
+    return point(floor(pos[0] / _XPeriod), floor(pos[1] / _YPeriod), floor(pos[2] / _ZPeriod));
+}
+
+point getGridIdxCont(point pos, float _XPeriod, float _YPeriod, float _ZPeriod)
+{
+    return point((pos[0] / _XPeriod), (pos[1] / _YPeriod), (pos[2] / _ZPeriod));
+}
+
+color mixColors(color palette[4], vector indices, vector mixes, float tuseCiel)
+{
+    if(tuseCiel > 0) {
+        return mixColorsCiel(palette, indices, mixes);
+    }
+    color color1 = palette[int(abs(indices.x)) % 4];
+    color color2 = palette[int(abs(indices.y)) % 4];
+    color color3 = palette[int(abs(indices.z)) % 4];
+
+    return color1 * mixes.x + color2 * mixes.y + color3 * mixes.z;
+}
+
+color mixColors(color cola, color colB, float t, float useciel) {
+    return cola * (1.0 - t) + colB * t;
+}
+
+
+void cubesWithStripes(point tpos, float xperiod, float yperiod, float zperiod, output vector indices, output vector mixes,
+    float useCiel, float use_y, float use_snake, float use_z, float worldSizeY) {
+        vector pos = abs(tpos);
+
+        float xperiodsin = xperiod;
+        float yperiodsin = yperiod;
+        float zperiodsin = zperiod;
+
+        indices[1] = floor(pos[1] / yperiodsin);
+        mixes[1] = pos[1] / yperiodsin - indices[1];
+
+        if(use_y > 0.0) {
+            indices[0] = floor(pos[0] / xperiodsin) + indices[1];
+            mixes[0] = pos[0] / xperiodsin - indices[0] + indices[1];
+        } else {
+            indices[0] = floor(pos[0] / xperiodsin);
+            mixes[0] = pos[0] / xperiodsin - indices[0];
+        }
+
+        if(use_snake > 0.0) {
+            if (fmod(floor(pos[0] / xperiodsin), 2.0) == 0.0) {
+                indices[2] = floor(pos[2] / zperiodsin) + indices[0];
+                mixes[2] = pos[2] / zperiodsin - indices[2] + indices[0];
+            } else {
+                if(use_z) {
+                    indices[2] = floor((worldSizeY - pos[1] + pos[0]) / zperiodsin) ;
+                    mixes[2] = (worldSizeY - pos[1] + pos[0]) / zperiodsin - indices[2];
+                } else {
+                    indices[2] = floor(worldSizeY - pos[1] + pos[0]) / zperiodsin;
+                    mixes[2] = worldSizeY - pos[1] + pos[0] / zperiodsin - indices[2];
+                }
+            }
+
+        } else {
+            if(use_z) {
+                indices[2] = floor(pos[2] / zperiodsin) + indices[0];
+                mixes[2] = pos[2] / zperiodsin - indices[2] + indices[0];
+            } else {
+                indices[2] = floor(pos[2] / zperiodsin);
+                mixes[2] = pos[2] / zperiodsin - indices[2];
+            }
+        }
+    }
+
+color getCol(color palette[4], point pos, float xperiod, float yperiod, float zperiod,
+float useCiel, float use_y, float use_snake, float use_z, float worldSizeY)
+{
+    vector indices, mixes;
+    cubesWithStripes(pos, xperiod, yperiod, zperiod, indices, mixes, useCiel, use_y, use_snake, use_z, worldSizeY);
+    color col = mixColors(palette, indices, mixes, 1);
+    return col;
+}
+
+
+point frac(point pos) {
+    return pos - floor(pos);
+}
+
+shader custom_shader(
+    point pos = P,                         // Input: world-space position
+    float xperiod = 1.0,                  // X periodicity
+    float yperiod = 1.0,                   // Y periodicity
+    float zperiod = 1.0,                   // Z periodicity
+    float radius = 1.0,                    // Radius for blending
+    float exponent = 2.0,                  // Exponent for distance factor
+    float use_rounded = 0,                   // Use rounded pattern
+    float use_y = 1,                         // Use y
+    float use_snake = 1,                     // Use snake
+    float use_z = 1,
+    float worldSizeY = 3.0,                // World size Y
+    color color0 = color(0.990566, 0.7779828, 0.2663314),   // Color 0
+    color color1 = color(0.1728818, 0.8535185, 0.990566),   // Color 1
+    color color2 = color(0.2779597, 0.1465824, 0.509434),   // Color 2
+    color color3 = color(0.5566037, 0.2467349, 0.09714309),   // Color 3
+    output color col = color(0.0, 0.0, 0.0) // Output color
+) {
+    point apos = abs(pos);
+
+    int xdir[2] = {0,1};
+    int ydir[2] = {0,1};
+
+    int zdir[3] = {-1,0,1};
+    
+    point gridPos = getGridIdx(apos, xperiod, yperiod, zperiod);
+    point fractional = frac(getGridIdxCont(apos, xperiod, yperiod, zperiod));
+
+    
+    point gridPosRight = point(gridPos[0] + 1, gridPos[1], gridPos[2]);
+    point gridPosUp = point(gridPos[0], gridPos[1] + 1, gridPos[2]);
+    point gridPosDiag = point(gridPos[0] + 1, gridPos[1] + 1, gridPos[2]);
+
+    point gridPosZ = point(gridPos[0], gridPos[1], gridPos[2] + 1);
+    point gridPosRightZ = point(gridPos[0] + 1, gridPos[1], gridPos[2] + 1);
+    point gridPosUpZ = point(gridPos[0], gridPos[1] + 1, gridPos[2] + 1);
+    point gridPosDiagZ = point(gridPos[0] + 1 , gridPos[1] + 1, gridPos[2] + 1);
+
+    color palette[4] = { color0, color1, color2, color3 };
+    // Partition space into stripes with cubes
+    
+    float a = 0.5;
+    color colBL = getCol(palette, gridPos, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);
+               // Bottom-left
+    color colBR = getCol(palette, gridPosRight, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Bottom-right
+
+    color colTL = getCol(palette, gridPosUp, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Top-left
+    color colTR = getCol(palette, gridPosDiag, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);      // Top-right
+
+    color colBLZ = getCol(palette, gridPosZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);              // Bottom-left
+    color colBRZ = getCol(palette, gridPosRightZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Bottom-right
+    color colTLZ = getCol(palette, gridPosUpZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Top-left
+    color colTRZ = getCol(palette, gridPosDiagZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);      // Top-right
+
+    // Interpolate horizontally
+    float useCielHere = 0;
+    color colBottom = mixColors(colBL, colBR, fractional.x, useCielHere);
+    color colTop = mixColors(colTL, colTR, fractional.x, useCielHere);
+
+    color colBottomZ = mixColors(colBLZ, colBRZ, fractional.x, useCielHere);
+    color colTopZ = mixColors(colTLZ, colTRZ, fractional.x, useCielHere);
+
+    color finalColor = mixColors(colBottom, colTop, fractional.y, useCielHere);
+
+    if(use_z == 0) {
+        col = finalColor;
+    } else {
+        color finalColorZ = mixColors(colBottomZ, colTopZ, fractional.y, useCielHere);
+        finalColor = mixColors(finalColor, finalColorZ, fractional.z, useCielHere);
+        col =  finalColor;
+    }
+    col =  finalColor;   
+}

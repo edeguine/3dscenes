@@ -1,0 +1,113 @@
+
+
+
+
+shader HorizonShader(
+
+    color _SkyColor = color(0.5, 0.7, 1.0),  // Horizon color
+    color _CircleColor = color(0.1, 0.2, 0.5),   // Zenith color
+    color _CircleColor2 = color(0.1, 0.2, 0.5),   // Zenith color
+    color _CircleColor3 = color(0.1, 0.2, 0.5),   // Zenith color
+    float offsetHorizon = 0,
+    
+    color _StarColor = color(1.0, 1.0, 1.0),     // Star color (white)
+    float _StarDensity = 0.01,                   // Density of stars
+    float _StarRadius = 1.0,                    // Radius of stars
+
+    float _HorizonDiffusionLambdaCol1 = 0.5,                        // Diffusion factor
+    float _HorizonDiffusionExponentCol1 = 0.5,                        // Diffusion factor
+    float _VariationFrequencyCol1 = 0.5,                        // Diffusion factor
+    float _VariationPhaseCol1 = 0.5,                        // Diffusion factor
+    float _ThetaVariationFrequencyCol1 = 0.5,                        // Diffusion factor
+    float _ThetaVariationPhaseCol1 = 0.5,                        // Diffusion factor
+
+    float _HorizonDiffusionLambdaCol2 = 0.5,                        // Diffusion factor
+    float _HorizonDiffusionExponentCol2 = 0.5,                        // Diffusion factor
+    float _VariationFrequencyCol2 = 0.5,                        // Diffusion factor
+    float _VariationPhaseCol2 = 0.5,                        // Diffusion factor
+    float _ThetaVariationFrequencyCol2 = 0.5,                        // Diffusion factor
+    float _ThetaVariationPhaseCol2 = 0.5,                        // Diffusion factor
+
+    float _HorizonDiffusionLambdaCol3 = 0.5,                        // Diffusion factor
+    float _HorizonDiffusionExponentCol3 = 0.5,                        // Diffusion factor
+    float _VariationFrequencyCol3 = 0.5,                        // Diffusion factor
+    float _VariationPhaseCol3 = 0.5,                        // Diffusion factor
+    float _ThetaVariationFrequencyCol3 = 0.5,                        // Diffusion factor
+    float _ThetaVariationPhaseCol3 = 0.5,                        // Diffusion factor
+
+    output color result = 0
+)
+{
+    
+    float _HorizonDiffusionLambda[3];
+    float _HorizonDiffusionExponent[3];
+    float _VariationFrequency[3];
+    float _VariationPhase[3];
+    float _ThetaVariationFrequency[3];
+    float _ThetaVariationPhase[3];
+
+    _HorizonDiffusionLambda[0] = _HorizonDiffusionLambdaCol1;
+    _HorizonDiffusionExponent[0] = _HorizonDiffusionExponentCol1;
+    _VariationFrequency[0] = _VariationFrequencyCol1;
+    _VariationPhase[0] = _VariationPhaseCol1;
+    _ThetaVariationFrequency[0] = _ThetaVariationFrequencyCol1;
+    _ThetaVariationPhase[0] = _ThetaVariationPhaseCol1;
+
+    _HorizonDiffusionLambda[1] = _HorizonDiffusionLambdaCol2;
+    _HorizonDiffusionExponent[1] = _HorizonDiffusionExponentCol2;
+    _VariationFrequency[1] = _VariationFrequencyCol2;
+    _VariationPhase[1] = _VariationPhaseCol2;
+    _ThetaVariationFrequency[1] = _ThetaVariationFrequencyCol2;
+    _ThetaVariationPhase[1] = _ThetaVariationPhaseCol2;
+
+    _HorizonDiffusionLambda[2] = _HorizonDiffusionLambdaCol3;
+    _HorizonDiffusionExponent[2] = _HorizonDiffusionExponentCol3;
+    _VariationFrequency[2] = _VariationFrequencyCol3;
+    _VariationPhase[2] = _VariationPhaseCol3;
+    _ThetaVariationFrequency[2] = _ThetaVariationFrequencyCol3;
+    _ThetaVariationPhase[2] = _ThetaVariationPhaseCol3;
+    float thetaFunction(float theta, int colIdx) {
+        return (1.0 + sin(theta * _ThetaVariationFrequency[colIdx] + _ThetaVariationPhase[colIdx])) / 2.0;
+    }
+
+    float variationFuncton(float theta, int colIdx) {
+        return (1.0 + sin(theta * _VariationFrequency[colIdx] + _VariationPhase[colIdx])) / 2.0;
+    }
+
+    float diffusionFunction(float height, float theta, int colIdx) {
+        // should be 1 at 0 and slowly diffuse out
+        if(height < 0) {
+            height = -height;
+        }
+        float intensity = exp(-height / _HorizonDiffusionLambda[colIdx] * _HorizonDiffusionExponent[colIdx]) * variationFuncton(thetaFunction(theta, colIdx), colIdx);
+        return intensity;
+    }
+    // Normalize the view direction
+    vector dir = normalize(-I);
+
+    float rho = 1.0; // Since the vector is normalized
+    float theta = atan2(dir[2], length(dir)) + offsetHorizon;
+    float phi = (atan2(dir[2], dir[0]) + M_PI) / (2.0 * M_PI); // Azimuthal angle normalized to [0, 1]
+
+    
+
+
+    float horizonDistance = dir[2]; 
+    float angle = atan2(dir[1], dir[0]);
+
+    result = _SkyColor;
+
+    for(int i = 0; i < 3; i++) {
+        color col = _CircleColor;
+        if(i == 1) {
+            col = _CircleColor2;
+        } else if(i == 2) {
+            col = _CircleColor3;
+        }
+        float circleMask = diffusionFunction(theta, angle, i);
+        result += col * circleMask;
+    }
+    
+
+    result /= 3 + 1;
+}
