@@ -177,10 +177,13 @@ color mixColors(color palette[4], vector indices, vector mixes, float tuseCiel)
     return color1 * mixes.x + color2 * mixes.y + color3 * mixes.z;
 }
 
-color mixColors(color cola, color colB, float t, float useciel) {
-    return cola * (1.0 - t) + colB * t;
+color mixColors(color cola, color colB, float t, float useCiel) {
+    if(useCiel > 0) {
+        return mixColorCiel(cola, colB, t);
+    } else {
+        return cola * (1.0 - t) + colB * t;
+    }
 }
-
 
 void cubesWithStripes(point tpos, float xperiod, float yperiod, float zperiod, output vector indices, output vector mixes,
     float useCiel, float use_y, float use_snake, float use_z, float worldSizeY) {
@@ -206,12 +209,12 @@ void cubesWithStripes(point tpos, float xperiod, float yperiod, float zperiod, o
                 indices[2] = floor(pos[2] / zperiodsin) + indices[0];
                 mixes[2] = pos[2] / zperiodsin - indices[2] + indices[0];
             } else {
-                if(use_z) {
+                if(use_z > 0) {
                     indices[2] = floor((worldSizeY - pos[1] + pos[0]) / zperiodsin) ;
                     mixes[2] = (worldSizeY - pos[1] + pos[0]) / zperiodsin - indices[2];
                 } else {
                     indices[2] = floor(worldSizeY - pos[1] + pos[0]) / zperiodsin;
-                    mixes[2] = worldSizeY - pos[1] + pos[0] / zperiodsin - indices[2];
+                    mixes[2] = (worldSizeY - pos[1] + pos[0]) / zperiodsin - indices[2];
                 }
             }
 
@@ -231,7 +234,7 @@ float useCiel, float use_y, float use_snake, float use_z, float worldSizeY)
 {
     vector indices, mixes;
     cubesWithStripes(pos, xperiod, yperiod, zperiod, indices, mixes, useCiel, use_y, use_snake, use_z, worldSizeY);
-    color col = mixColors(palette, indices, mixes, 1);
+    color col = mixColors(palette, indices, mixes, useCiel);
     return col;
 }
 
@@ -282,18 +285,18 @@ shader custom_shader(
     color palette[4] = { color0, color1, color2, color3 };
     // Partition space into stripes with cubes
     
-    float a = 0.5;
-    color colBL = getCol(palette, gridPos, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);
+    float useCiel = 1.0;
+    color colBL = getCol(palette, gridPos, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);
                // Bottom-left
-    color colBR = getCol(palette, gridPosRight, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Bottom-right
+    color colBR = getCol(palette, gridPosRight, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);          // Bottom-right
 
-    color colTL = getCol(palette, gridPosUp, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Top-left
-    color colTR = getCol(palette, gridPosDiag, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);      // Top-right
+    color colTL = getCol(palette, gridPosUp, xperiod, yperiod, zperiod,useCiel, use_y, use_snake, use_z, worldSizeY);          // Top-left
+    color colTR = getCol(palette, gridPosDiag, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);      // Top-right
 
-    color colBLZ = getCol(palette, gridPosZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);              // Bottom-left
-    color colBRZ = getCol(palette, gridPosRightZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Bottom-right
-    color colTLZ = getCol(palette, gridPosUpZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);          // Top-left
-    color colTRZ = getCol(palette, gridPosDiagZ, xperiod, yperiod, zperiod, 0.0, use_y, use_snake, use_z, worldSizeY);      // Top-right
+    color colBLZ = getCol(palette, gridPosZ, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);              // Bottom-left
+    color colBRZ = getCol(palette, gridPosRightZ, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);          // Bottom-right
+    color colTLZ = getCol(palette, gridPosUpZ, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);          // Top-left
+    color colTRZ = getCol(palette, gridPosDiagZ, xperiod, yperiod, zperiod, useCiel, use_y, use_snake, use_z, worldSizeY);      // Top-right
 
     // Interpolate horizontally
     float useCielHere = 0;
