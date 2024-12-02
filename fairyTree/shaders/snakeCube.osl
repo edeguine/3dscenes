@@ -265,6 +265,7 @@ shader custom_shader(
 
     int zdir[3] = {-1,0,1};
     
+    
     point gridPos = getGridIdx(apos, xperiod, yperiod, zperiod);
     point fractional = frac(getGridIdxCont(apos, xperiod, yperiod, zperiod));
 
