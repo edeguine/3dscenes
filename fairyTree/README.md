@@ -1,6 +1,6 @@
 # Fairy tree
 
-![](fairyTreeRenderBlender.png)
+![](assets/fairyTreeRenderBlender.png)
 
 This was a fun project made for an art challenge on Discord.
 
