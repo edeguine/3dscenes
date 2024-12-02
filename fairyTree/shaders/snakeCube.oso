@@ -1,6 +1,6 @@
 OpenShadingLanguage 1.00
 # Compiled by oslc 1.13.7.0
-# options: -o C:\Users\edegu\AppData\Local\Temp\tmpicziz5lx.oso -IC:\Program Files\Blender Foundation\Blender 4.3\4.3\scripts\addons_core\cycles\shader
+# options: -o C:\Users\edegu\AppData\Local\Temp\tmp7n6sgti_.oso -IC:\Program Files\Blender Foundation\Blender 4.3\4.3\scripts\addons_core\cycles\shader
 shader custom_shader
 param	point	pos	0 0 0		%read{1,1} %write{0,0} %initexpr
 param	float	xperiod	1		%read{7,3344} %write{2147483647,-1}
@@ -8,16 +8,16 @@ param	float	yperiod	1		%read{10,3345} %write{2147483647,-1}
 param	float	zperiod	1		%read{13,3346} %write{2147483647,-1}
 param	float	radius	1		%read{2147483647,-1} %write{2147483647,-1}
 param	float	exponent	2		%read{2147483647,-1} %write{2147483647,-1}
-param	float	use_rounded	0		%read{2147483647,-1} %write{2147483647,-1}
+param	float	use_rounded	0		%read{3839,3839} %write{2147483647,-1}
 param	float	use_y	1		%read{87,3356} %write{2147483647,-1}
 param	float	use_snake	1		%read{111,3380} %write{2147483647,-1}
-param	float	use_z	1		%read{132,3839} %write{2147483647,-1}
+param	float	use_z	1		%read{132,3841} %write{2147483647,-1}
 param	float	worldSizeY	3		%read{135,3426} %write{2147483647,-1}
 param	color	color0	0.990566015 0.777982771 0.266331404		%read{67,67} %write{2147483647,-1}
 param	color	color1	0.172881797 0.853518486 0.990566015		%read{68,68} %write{2147483647,-1}
 param	color	color2	0.277959704 0.146582395 0.509433985		%read{69,69} %write{2147483647,-1}
 param	color	color3	0.55660373 0.246734902 0.0971430913		%read{70,70} %write{2147483647,-1}
-oparam	color	col	0 0 0		%read{2147483647,-1} %write{3841,3855}
+oparam	color	col	0 0 0		%read{2147483647,-1} %write{3843,3857}
 global	point	P	%read{0,0} %write{2147483647,-1}
 local	float	___365_R	%read{211,3613} %write{208,3600}
 local	float	___365_G	%read{217,3614} %write{209,3601}
@@ -73,7 +73,7 @@ local	int[2]	xdir	%read{2147483647,-1} %write{2,2}
 local	int[2]	ydir	%read{2147483647,-1} %write{3,3}
 local	int[3]	zdir	%read{2147483647,-1} %write{4,4}
 local	point	gridPos	%read{27,74} %write{15,15}
-local	point	fractional	%read{3809,3848} %write{26,26}
+local	point	fractional	%read{3809,3850} %write{26,26}
 local	point	gridPosRight	%read{541,541} %write{31,31}
 local	point	gridPosUp	%read{1008,1008} %write{36,36}
 local	point	gridPosDiag	%read{1475,1475} %write{42,42}
@@ -83,7 +83,7 @@ local	point	gridPosUpZ	%read{2876,2876} %write{59,59}
 local	point	gridPosDiagZ	%read{3343,3343} %write{66,66}
 local	color[4]	palette	%read{196,3798} %write{67,70}
 local	float	a	%read{2147483647,-1} %write{71,71}
-local	color	colBL	%read{3812,3812} %write{538,538}
+local	color	colBL	%read{3812,3857} %write{538,538}
 local	color	colBR	%read{3813,3813} %write{1005,1005}
 local	color	colTL	%read{3818,3818} %write{1472,1472}
 local	color	colTR	%read{3819,3819} %write{1939,1939}
@@ -94,23 +94,23 @@ local	color	colTRZ	%read{3831,3831} %write{3807,3807}
 local	float	useCielHere	%read{2147483647,-1} %write{3808,3808}
 local	color	colBottom	%read{3836,3836} %write{3814,3814}
 local	color	colTop	%read{3837,3837} %write{3820,3820}
-local	color	colBottomZ	%read{3845,3845} %write{3826,3826}
-local	color	colTopZ	%read{3846,3846} %write{3832,3832}
-local	color	finalColor	%read{3841,3855} %write{3838,3853}
-local	color	___396_finalColorZ	%read{3852,3852} %write{3847,3847}
+local	color	colBottomZ	%read{3847,3847} %write{3826,3826}
+local	color	colTopZ	%read{3848,3848} %write{3832,3832}
+local	color	finalColor	%read{3843,3856} %write{3838,3855}
+local	color	___397_finalColorZ	%read{3854,3854} %write{3849,3849}
 const	int[2]	$const1	0 1 		%read{2,3} %write{2147483647,-1}
 const	int[3]	$const2	-1 0 1 		%read{4,4} %write{2147483647,-1}
 const	string	$const3	"getGridIdx"		%read{5,5} %write{2147483647,-1}
 temp	float	$tmp1	%read{15,15} %write{8,8}
-const	int	$const4	0		%read{6,3839} %write{2147483647,-1}
+const	int	$const4	0		%read{6,3841} %write{2147483647,-1}
 temp	float	$tmp2	%read{7,7} %write{6,6}
 temp	float	$tmp3	%read{8,8} %write{7,7}
 temp	float	$tmp4	%read{15,15} %write{11,11}
-const	int	$const5	1		%read{9,3842} %write{2147483647,-1}
+const	int	$const5	1		%read{9,3844} %write{2147483647,-1}
 temp	float	$tmp5	%read{10,10} %write{9,9}
 temp	float	$tmp6	%read{11,11} %write{10,10}
 temp	float	$tmp7	%read{15,15} %write{14,14}
-const	int	$const6	2		%read{12,3848} %write{2147483647,-1}
+const	int	$const6	2		%read{12,3850} %write{2147483647,-1}
 temp	float	$tmp8	%read{13,13} %write{12,12}
 temp	float	$tmp9	%read{14,14} %write{13,13}
 temp	point	$tmp10	%read{25,26} %write{23,23}
@@ -125,7 +125,7 @@ const	string	$const8	"frac"		%read{24,24} %write{2147483647,-1}
 temp	point	$tmp17	%read{26,26} %write{25,25}
 temp	float	$tmp18	%read{28,28} %write{27,27}
 temp	float	$tmp19	%read{31,31} %write{28,28}
-const	float	$const9	1		%read{28,3850} %write{2147483647,-1}
+const	float	$const9	1		%read{28,3852} %write{2147483647,-1}
 temp	float	$tmp20	%read{31,31} %write{29,29}
 temp	float	$tmp21	%read{31,31} %write{30,30}
 temp	float	$tmp22	%read{36,36} %write{32,32}
@@ -252,7 +252,7 @@ temp	float	$tmp136	%read{184,184} %write{183,183}
 temp	float	$tmp137	%read{186,186} %write{184,184}
 temp	float	$tmp138	%read{186,186} %write{185,185}
 temp	float	$tmp139	%read{187,187} %write{186,186}
-const	string	$const16	"mixColors"		%read{188,3849} %write{2147483647,-1}
+const	string	$const16	"mixColors"		%read{188,3851} %write{2147483647,-1}
 temp	int	$tmp140	%read{190,190} %write{189,189}
 const	string	$const17	"mixColorsCiel"		%read{191,3460} %write{2147483647,-1}
 temp	int	$tmp141	%read{195,195} %write{194,194}
@@ -2365,14 +2365,15 @@ temp	float	$tmp2212	%read{3836,3836} %write{3835,3835}
 temp	color	$tmp2213	%read{3838,3838} %write{3836,3836}
 temp	color	$tmp2214	%read{3838,3838} %write{3837,3837}
 temp	int	$tmp2215	%read{3840,3840} %write{3839,3839}
-temp	float	$tmp2216	%read{3844,3846} %write{3842,3842}
-temp	float	$tmp2217	%read{3845,3845} %write{3844,3844}
-temp	color	$tmp2218	%read{3847,3847} %write{3845,3845}
-temp	color	$tmp2219	%read{3847,3847} %write{3846,3846}
-temp	float	$tmp2220	%read{3850,3852} %write{3848,3848}
-temp	float	$tmp2221	%read{3851,3851} %write{3850,3850}
-temp	color	$tmp2222	%read{3853,3853} %write{3851,3851}
-temp	color	$tmp2223	%read{3853,3853} %write{3852,3852}
+temp	int	$tmp2216	%read{3842,3842} %write{3841,3841}
+temp	float	$tmp2217	%read{3846,3848} %write{3844,3844}
+temp	float	$tmp2218	%read{3847,3847} %write{3846,3846}
+temp	color	$tmp2219	%read{3849,3849} %write{3847,3847}
+temp	color	$tmp2220	%read{3849,3849} %write{3848,3848}
+temp	float	$tmp2221	%read{3852,3854} %write{3850,3850}
+temp	float	$tmp2222	%read{3853,3853} %write{3852,3852}
+temp	color	$tmp2223	%read{3855,3855} %write{3853,3853}
+temp	color	$tmp2224	%read{3855,3855} %write{3854,3854}
 code pos
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:245
 #     float xperiod = 1.0,                  // X periodicity
@@ -8939,7 +8940,7 @@ code ___main___
 	mul		$tmp2210 colTRZ $tmp2207 	%argrw{"wrr"}
 	add		colTopZ $tmp2209 $tmp2210 	%argrw{"wrr"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:306
-# 
+#     if(use_rounded > 0) {
 	compref		$tmp2211 fractional $const5 	%line{306} %argrw{"wrr"}
 	functioncall	$const16 3839 	%argrw{"r"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:182
@@ -8948,37 +8949,41 @@ code ___main___
 	mul		$tmp2213 colBottom $tmp2212 	%argrw{"wrr"}
 	mul		$tmp2214 colTop $tmp2211 	%argrw{"wrr"}
 	add		finalColor $tmp2213 $tmp2214 	%argrw{"wrr"}
+# C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:307
+#         if(use_z == 0) {
+	gt		$tmp2215 use_rounded $const4 	%line{307} %argrw{"wrr"}
+	if		$tmp2215 3857 3858 	%argrw{"r"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:308
-#         col = finalColor;
-	eq		$tmp2215 use_z $const4 	%line{308} %argrw{"wrr"}
-	if		$tmp2215 3842 3855 	%argrw{"r"}
+#             col = finalColor;
+	eq		$tmp2216 use_z $const4 	%line{308} %argrw{"wrr"}
+	if		$tmp2216 3844 3857 	%argrw{"r"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:309
-#     } else {
+#         } else {
 	assign		col finalColor 	%line{309} %argrw{"wr"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:311
-#         finalColor = mixColors(finalColor, finalColorZ, fractional.z, useCielHere);
-	compref		$tmp2216 fractional $const5 	%line{311} %argrw{"wrr"}
-	functioncall	$const16 3848 	%argrw{"r"}
+#             finalColor = mixColors(finalColor, finalColorZ, fractional.z, useCielHere);
+	compref		$tmp2217 fractional $const5 	%line{311} %argrw{"wrr"}
+	functioncall	$const16 3850 	%argrw{"r"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:182
 # }
-	sub		$tmp2217 $const9 $tmp2216 	%line{182} %argrw{"wrr"}
-	mul		$tmp2218 colBottomZ $tmp2217 	%argrw{"wrr"}
-	mul		$tmp2219 colTopZ $tmp2216 	%argrw{"wrr"}
-	add		___396_finalColorZ $tmp2218 $tmp2219 	%argrw{"wrr"}
+	sub		$tmp2218 $const9 $tmp2217 	%line{182} %argrw{"wrr"}
+	mul		$tmp2219 colBottomZ $tmp2218 	%argrw{"wrr"}
+	mul		$tmp2220 colTopZ $tmp2217 	%argrw{"wrr"}
+	add		___397_finalColorZ $tmp2219 $tmp2220 	%argrw{"wrr"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:312
-#         col =  finalColor;
-	compref		$tmp2220 fractional $const6 	%line{312} %argrw{"wrr"}
-	functioncall	$const16 3854 	%argrw{"r"}
+#             col =  finalColor;
+	compref		$tmp2221 fractional $const6 	%line{312} %argrw{"wrr"}
+	functioncall	$const16 3856 	%argrw{"r"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:182
 # }
-	sub		$tmp2221 $const9 $tmp2220 	%line{182} %argrw{"wrr"}
-	mul		$tmp2222 finalColor $tmp2221 	%argrw{"wrr"}
-	mul		$tmp2223 ___396_finalColorZ $tmp2220 	%argrw{"wrr"}
-	add		finalColor $tmp2222 $tmp2223 	%argrw{"wrr"}
+	sub		$tmp2222 $const9 $tmp2221 	%line{182} %argrw{"wrr"}
+	mul		$tmp2223 finalColor $tmp2222 	%argrw{"wrr"}
+	mul		$tmp2224 ___397_finalColorZ $tmp2221 	%argrw{"wrr"}
+	add		finalColor $tmp2223 $tmp2224 	%argrw{"wrr"}
 # C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:313
-#     }
+#         }
 	assign		col finalColor 	%line{313} %argrw{"wr"}
-# C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:315
-#     
-	assign		col finalColor 	%line{315} %argrw{"wr"}
+# C:\\Users\\edegu\\code\\3dscenes\\fairyTree\\shaders\\snakeCube.osl:316
+#     } 
+	assign		col colBL 	%line{316} %argrw{"wr"}
 	end

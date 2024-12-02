@@ -303,13 +303,15 @@ shader custom_shader(
     color colTopZ = mixColors(colTLZ, colTRZ, fractional.x, useCielHere);
 
     color finalColor = mixColors(colBottom, colTop, fractional.y, useCielHere);
-
-    if(use_z == 0) {
-        col = finalColor;
+    if(use_rounded > 0) {
+        if(use_z == 0) {
+            col = finalColor;
+        } else {
+            color finalColorZ = mixColors(colBottomZ, colTopZ, fractional.y, useCielHere);
+            finalColor = mixColors(finalColor, finalColorZ, fractional.z, useCielHere);
+            col =  finalColor;
+        }
     } else {
-        color finalColorZ = mixColors(colBottomZ, colTopZ, fractional.y, useCielHere);
-        finalColor = mixColors(finalColor, finalColorZ, fractional.z, useCielHere);
-        col =  finalColor;
-    }
-    col =  finalColor;   
+        col = colBL;   
+    } 
 }
